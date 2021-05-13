@@ -71,7 +71,7 @@ class Audit:
             return result
 
     def inspect_certspotter(self):
-        response = requests.get(f'https://certspotter.com/api/v0/certs?domain={self.domain}').json()
+        response = requests.get(f'https://certspotter.com/api/v1/issuances?domain={self.domain}&include_subdomains=true&expand=dns_names').json()
         with open('certspotter.json', 'w') as f:
             json.dump(response, f)
         return response
