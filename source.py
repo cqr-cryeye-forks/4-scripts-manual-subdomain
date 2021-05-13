@@ -1,77 +1,64 @@
-import requests
-from urllib.parse import urlsplit
 import json
-from bs4 import BeautifulSoup
+
+from utils import request, clear_domain
 
 
 class Audit:
 
-    def __init__(self, url):
-        self.url = url
-        self.domain = urlsplit(self.url).netloc
+    def __init__(self, domain: str):
+        self.domain = clear_domain(domain=domain)
+        self.threat_crowd_url = f'https://www.threatcrowd.org/searchApi/v2/domain/report/?domain={self.domain}'
+        self.hacker_target_url = f'https://api.hackertarget.com/hostsearch/?q={self.domain}'
+        self.crt_sh_url = f'https://crt.sh/?q={self.domain}&output=json'
+        self.certs_potter_url = f'https://certspotter.com/api/v1/issuances?domain={self.domain}&include_subdomains=true&expand=dns_names'
+        self.result = {}
 
-    def inspect_threat_crowd(self):
-        response = requests.get(f' https://www.threatcrowd.org/searchApi/v2/domain/report/?domain={self.domain}')
-        response = response.json()
-        with open('threatcrowd.json', 'w') as f:
-            json.dump(response, f)
-        return response
+    def _inspect_threat_crowd(self) -> list:
+        response = request(url=self.threat_crowd_url)
+        return self._parse_threat_crowd_resp(data=response.json()) if response else []
 
-    def inspect_hackertarget_hostsearch(self):
-        response = requests.get(f'https://api.hackertarget.com/hostsearch/?q={self.domain}').text
-        response = response.splitlines()
-        result = []
-        for line in response:
-            domain, ip = line.split(',', 1)
-            result.append({
-                'domain': domain,
-                'ip': ip
-            })
-        with open('hackertarget.json', 'w') as f:
-            json.dump(result, f)
-        return response
+    def _inspect_hacker_target(self):
+        response = request(url=self.hacker_target_url)
+        return self._parse_hacker_target_resp(data=response.text) if response else []
 
-    def inspect_crt_sh(self):
-        response = requests.get(f'https://crt.sh/?q={self.domain}').text
-        soup = BeautifulSoup(response, 'html.parser')
-        table = soup.select('td.outer')
-        attrs = table[1].attrs
-        if table[1].i:
-            if table[1].i.getText() == 'None found':
-                result = {
-                    'success': False,
-                    'message': 'None found'
-                }
-                with open('crt_sh.json', 'w') as f:
-                    json.dump(result, f)
+    def _inspect_crt_sh(self):
+        response = request(url=self.crt_sh_url)
+        return response.json() if response else []
 
-                return result
-        else:
-            table = table[1]
-            table = table.table
-            rows = table.find_all('tr')
-            strings = []
-            for row in rows:
-                cols = row.find_all('td')
-                cols = [x.text.strip() for x in cols]
-                strings.append(cols)
-            strings.pop(0)
-            result = []
-            for string in strings:
-                result.append({
-                    'crt.sh ID': string[0],
-                    'Logged at': string[1],
-                    'Not before': string[2],
-                    'Not after': string[3],
-                    'Issuer name': string[4]
+    def _inspect_certs_potter(self):
+        response = request(url=self.certs_potter_url)
+        return self._parse_certs_potter_resp(data=response.json()) if response else []
+
+    def run(self):
+        self.result['threat_crowd'] = self._inspect_threat_crowd()
+        self.result['hacker_target'] = self._inspect_hacker_target()
+        self.result['crt_sh'] = self._inspect_crt_sh()
+        self.result['certs_potter'] = self._inspect_certs_potter()
+
+        with open('output.json', 'w') as f:
+            json.dump(self.result, f, indent=2)
+
+    @staticmethod
+    def _parse_hacker_target_resp(data: str):
+        domains: list = []
+        for line in data.splitlines():
+            try:
+                domain, ip = line.split(',', 1)
+                domains.append({
+                    'domain': domain,
+                    'ip': ip
                 })
-            with open('crt_sh.json', 'w') as f:
-                json.dump(result, f)
+            except ValueError:
+                pass
+        return domains
 
-            return result
+    @staticmethod
+    def _parse_certs_potter_resp(data: dict) -> list:
+        dns_names = []
+        for item in data:
+            dns_names.extend(item.get('dns_names', []))
+        return [{'domain': item} for item in set(dns_names)]
 
-    def inspect_certspotter(self):
-        response = requests.get(f'https://certspotter.com/api/v0/certs?domain={self.domain}').json()
-        with open('certspotter.json', 'w') as f:
-            json.dump(response, f)
-        return response
+    @staticmethod
+    def _parse_threat_crowd_resp(data: dict):
+        return [{'domain': item} for item in set(data.get('subdomains', []))]
