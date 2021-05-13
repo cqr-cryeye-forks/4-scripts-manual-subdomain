@@ -1,6 +1,6 @@
 # 4-scripts-manual-subdomain
 
-# Installation
+## Installation
   pip install -r requirements.txt
-# Usage
-  python manage.py <url>
+## Usage
+  python 4sms.py -d domain

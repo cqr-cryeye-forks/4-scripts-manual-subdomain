@@ -1,0 +1,88 @@
+{
+  "threat_crowd": [
+    {
+      "domain": "codeload .github.com"
+    },
+    {
+      "domain": "github.com"
+    },
+    {
+      "domain": "0.github.com"
+    },
+    {
+      "domain": "000.github.com"
+    },
+    {
+      "domain": "mtb2000.github.com"
+    },
+  ],
+  "hacker_target": [
+    {
+      "domain": "ns1.github.com",
+      "ip": "192.0.2.1"
+    },
+    {
+      "domain": "ns2.github.com",
+      "ip": "192.0.2.2"
+    },
+    {
+      "domain": "cdn-185-199-110-133.github.com",
+      "ip": "185.199.110.133"
+    }
+  ],
+  "crt_sh": [
+    {
+      "issuer_ca_id": 179890,
+      "issuer_name": "C=BE, O=GlobalSign nv-sa, CN=GlobalSign Atlas R3 DV TLS CA 2020",
+      "common_name": "f.cloud.github.com",
+      "name_value": "f.cloud.github.com",
+      "id": 4514434585,
+      "entry_timestamp": "2021-05-12T18:55:40.063",
+      "not_before": "2021-05-12T18:55:36",
+      "not_after": "2022-06-13T18:55:35",
+      "serial_number": "015c7639616e88e6fcd9feff14b9192a"
+    },
+    {
+      "issuer_ca_id": 8239,
+      "issuer_name": "C=BE, O=GlobalSign nv-sa, CN=GlobalSign CloudSSL CA - SHA256 - G3",
+      "common_name": "r2.shared.global.fastly.net",
+      "name_value": "f.cloud.github.com",
+      "id": 4349616756,
+      "entry_timestamp": "2021-04-09T10:13:22.224",
+      "not_before": "2021-04-05T22:28:55",
+      "not_after": "2021-06-20T21:11:25",
+      "serial_number": "0c1686476c3d50db5399ad0f"
+    },
+    {
+      "issuer_ca_id": 8239,
+      "issuer_name": "C=BE, O=GlobalSign nv-sa, CN=GlobalSign CloudSSL CA - SHA256 - G3",
+      "common_name": "r2.shared.global.fastly.net",
+      "name_value": "f.cloud.github.com",
+      "id": 4332205095,
+      "entry_timestamp": "2021-04-05T22:28:56.619",
+      "not_before": "2021-04-05T22:28:55",
+      "not_after": "2021-06-20T21:11:25",
+      "serial_number": "0c1686476c3d50db5399ad0f"
+    }
+  ],
+  "certs_potter": [
+    {
+      "domain": "import.github.com"
+    },
+    {
+      "domain": "porter.github.com"
+    },
+    {
+      "domain": "api.security.github.com"
+    },
+    {
+      "domain": "docs.github.com"
+    },
+    {
+      "domain": "www.radiomagonline.com"
+    },
+    {
+      "domain": "www.retirementcomm.com"
+    }
+  ]
+}
