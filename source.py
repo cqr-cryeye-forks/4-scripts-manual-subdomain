@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import time
-
+import pathlib
 
 class Audit:
 
@@ -98,7 +98,9 @@ class Audit:
             "data_hacker_target": data_hacker_target,
         }
 
-        with open("result.json", 'w') as file:
-            json.dump(data_final, file)
+        root_path = pathlib.Path(__file__).parent
+        file_path = root_path.joinpath('result.json')
+        file_path.write_text(json.dumps(data_final))
+
 
 
