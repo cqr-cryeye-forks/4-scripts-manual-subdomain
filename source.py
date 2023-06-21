@@ -16,13 +16,17 @@ class Audit:
         for line in response:
             if line == 'API count exceeded - Increase Quota with Membership':  # 50 reqs per day API limitation
                 break
+
             domain, ip = line.split(',', 1)
             result.append({
                 'domain': domain,
                 'ip': ip
             })
+
         with open('hackertarget.json', 'w') as f:
             json.dump(result, f)
+
+        print(f"Tested for inspect_hackertarget_hostsearch. Result is {result}")
         return response
 
     def inspect_crt_sh(self):
@@ -40,6 +44,11 @@ class Audit:
                 table = soup.select('td.outer')
 
         if not table:
+            result = []
+            with open('crt_sh.json', 'w') as f:
+                json.dump(result, f)
+
+            print(f"Tested for inspect_crt_sh. Result is {result}")
             return []
 
         elif table[1].i:
@@ -47,7 +56,7 @@ class Audit:
                 result = []
                 with open('crt_sh.json', 'w') as f:
                     json.dump(result, f)
-
+                print(f"Tested for inspect_crt_sh. Result is {result}")
                 return result
         else:
             table = table[1]
@@ -71,12 +80,14 @@ class Audit:
             with open('crt_sh.json', 'w') as f:
                 json.dump(result, f)
 
+            print(f"Tested for inspect_crt_sh. Result is {result}")
             return result
 
     def inspect_certspotter(self):
         response = requests.get(f'https://api.certspotter.com/v1/issuances?domain={self.domain}').json()
         with open('certspotter.json', 'w') as f:
             json.dump(response, f)
+        print(f"Tested for inspect_certspotter. Result is {response}")
         return response
 
     def union_files(self):
@@ -98,6 +109,7 @@ class Audit:
         root_path = pathlib.Path(__file__).parent
         file_path = root_path.joinpath('result.json')
         file_path.write_text(json.dumps(data_final))
+        print("Result Files united successfully!")
 
 
 
