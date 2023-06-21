@@ -6,22 +6,16 @@ from bs4 import BeautifulSoup
 
 class Audit:
 
-    def __init__(self, url):
-        self.url = url
-        self.domain = urlsplit(self.url).netloc
-
-    def inspect_threat_crowd(self):
-        response = requests.get(f' https://www.threatcrowd.org/searchApi/v2/domain/report/?domain={self.domain}')
-        response = response.json()
-        with open('threatcrowd.json', 'w') as f:
-            json.dump(response, f)
-        return response
+    def __init__(self, domain):
+        self.domain = domain
 
     def inspect_hackertarget_hostsearch(self):
         response = requests.get(f'https://api.hackertarget.com/hostsearch/?q={self.domain}').text
         response = response.splitlines()
         result = []
         for line in response:
+            if line == 'API count exceeded - Increase Quota with Membership':  # 50 reqs per day
+                break
             domain, ip = line.split(',', 1)
             result.append({
                 'domain': domain,
@@ -35,7 +29,7 @@ class Audit:
         response = requests.get(f'https://crt.sh/?q={self.domain}').text
         soup = BeautifulSoup(response, 'html.parser')
         table = soup.select('td.outer')
-        attrs = table[1].attrs
+        # attrs = table[1].attrs
         if table[1].i:
             if table[1].i.getText() == 'None found':
                 result = {
@@ -71,7 +65,7 @@ class Audit:
             return result
 
     def inspect_certspotter(self):
-        response = requests.get(f'https://certspotter.com/api/v0/certs?domain={self.domain}').json()
+        response = requests.get(f'https://api.certspotter.com/v1/issuances?domain={self.domain}').json()
         with open('certspotter.json', 'w') as f:
             json.dump(response, f)
         return response

@@ -5,11 +5,11 @@ import sys
 from source import Audit
 
 
-url = sys.argv[1]
+domain = sys.argv[1]
 
-audit = Audit(url)
+audit = Audit(domain)
 
-audit.inspect_threat_crowd()
+# audit.inspect_threat_crowd()
 audit.inspect_hackertarget_hostsearch()
 audit.inspect_crt_sh()
 audit.inspect_certspotter()
