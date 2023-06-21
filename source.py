@@ -36,7 +36,7 @@ class Audit:
             response = requests.get(f'https://crt.sh/?q={self.domain}')
             if response.status_code == 502:
                 print(f'inspect_crt_sh test: Got 502 status Response code. '
-                      f'Trying again 15 sec delay. Attempt {attempt}/{NUM_RETRIES})')
+                      f'Trying again 15 sec delay. Attempt {attempt}/{NUM_RETRIES}\n)')
                 time.sleep(15)
                 continue
             else:
@@ -48,7 +48,7 @@ class Audit:
             with open('crt_sh.json', 'w') as f:
                 json.dump(result, f)
 
-            print(f"Tested for inspect_crt_sh. Result is {result}")
+            print(f"Tested for inspect_crt_sh. Result is {result}\n")
             return []
 
         elif table[1].i:
@@ -56,7 +56,7 @@ class Audit:
                 result = []
                 with open('crt_sh.json', 'w') as f:
                     json.dump(result, f)
-                print(f"Tested for inspect_crt_sh. Result is {result}")
+                print(f"Tested for inspect_crt_sh. Result is {result}\n")
                 return result
         else:
             table = table[1]
@@ -80,14 +80,19 @@ class Audit:
             with open('crt_sh.json', 'w') as f:
                 json.dump(result, f)
 
-            print(f"Tested for inspect_crt_sh. Result is {result}")
+            print(f"Tested for inspect_crt_sh. Result is {result}\n")
             return result
 
     def inspect_certspotter(self):
         response = requests.get(f'https://api.certspotter.com/v1/issuances?domain={self.domain}').json()
+        if response:
+            data = response
+        else:
+            data = []
+
         with open('certspotter.json', 'w') as f:
-            json.dump(response, f)
-        print(f"Tested for inspect_certspotter. Result is {response}")
+            json.dump(data, f)
+        print(f"Tested for inspect_certspotter. Result is {data}\n")
         return response
 
     def union_files(self):
@@ -109,7 +114,7 @@ class Audit:
         root_path = pathlib.Path(__file__).parent
         file_path = root_path.joinpath('result.json')
         file_path.write_text(json.dumps(data_final))
-        print("Result Files united successfully!")
+        print("Result Files united successfully!\n")
 
 
 
