@@ -1,7 +1,7 @@
 import requests
-from urllib.parse import urlsplit
 import json
 from bs4 import BeautifulSoup
+import time
 
 
 class Audit:
@@ -14,7 +14,7 @@ class Audit:
         response = response.splitlines()
         result = []
         for line in response:
-            if line == 'API count exceeded - Increase Quota with Membership':  # 50 reqs per day
+            if line == 'API count exceeded - Increase Quota with Membership':  # 50 reqs per day API limitation
                 break
             domain, ip = line.split(',', 1)
             result.append({
@@ -26,11 +26,23 @@ class Audit:
         return response
 
     def inspect_crt_sh(self):
-        response = requests.get(f'https://crt.sh/?q={self.domain}').text
-        soup = BeautifulSoup(response, 'html.parser')
-        table = soup.select('td.outer')
-        # attrs = table[1].attrs
-        if table[1].i:
+        table = []
+        NUM_RETRIES = 5  # Sometimes I randomly got 502 Gateway without a reason (server issue?)
+        for attempt in range(1, NUM_RETRIES + 1):
+            response = requests.get(f'https://crt.sh/?q={self.domain}')
+            if response.status_code == 502:
+                print(f'inspect_crt_sh test: Got 502 status Response code. '
+                      f'Trying again 15 sec delay. Attempt {attempt}/{NUM_RETRIES})')
+                time.sleep(15)
+                continue
+            else:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                table = soup.select('td.outer')
+
+        if not table:
+            return []
+
+        elif table[1].i:
             if table[1].i.getText() == 'None found':
                 result = {
                     'success': False,
@@ -69,3 +81,24 @@ class Audit:
         with open('certspotter.json', 'w') as f:
             json.dump(response, f)
         return response
+
+    def union_files(self):
+        with open("certspotter.json", 'r') as file_1:
+            data_certspotter = json.load(file_1)
+
+        with open('crt_sh.json', 'r') as file_2:
+            data_crt_sh = json.load(file_2)
+
+        with open('hackertarget.json', 'r') as file_3:
+            data_hacker_target = json.load(file_3)
+
+        data_final = {
+            "data_certspotter": data_certspotter,
+            "data_crt_sh": data_crt_sh,
+            "data_hacker_target": data_hacker_target,
+        }
+
+        with open("result.json", 'w') as file:
+            json.dump(data_final, file)
+
+

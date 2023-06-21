@@ -13,3 +13,5 @@ audit = Audit(domain)
 audit.inspect_hackertarget_hostsearch()
 audit.inspect_crt_sh()
 audit.inspect_certspotter()
+audit.union_files()
+
