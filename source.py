@@ -65,11 +65,11 @@ class Audit:
             result = []
             for string in strings:
                 result.append({
-                    'crt.sh ID': string[0],
-                    'Logged at': string[1],
-                    'Not before': string[2],
-                    'Not after': string[3],
-                    'Issuer name': string[4]
+                    'crt_sh_id': string[0],
+                    'logged_at': string[1],
+                    'not_before': string[2],
+                    'not_after': string[3],
+                    'issuer_name': string[4]
                 })
             with open('crt_sh.json', 'w') as f:
                 json.dump(result, f)
