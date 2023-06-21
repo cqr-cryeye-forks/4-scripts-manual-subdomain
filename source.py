@@ -44,10 +44,7 @@ class Audit:
 
         elif table[1].i:
             if table[1].i.getText() == 'None found':
-                result = {
-                    'success': False,
-                    'message': 'None found'
-                }
+                result = []
                 with open('crt_sh.json', 'w') as f:
                     json.dump(result, f)
 
